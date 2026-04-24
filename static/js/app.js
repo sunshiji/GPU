@@ -365,7 +365,7 @@ class GPUMonitorApp {
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">风扇转速</span>
-                            <span class="stat-value">${gpu.fan_speed}%</span>
+                            <span class="stat-value">${gpu.fan_speed_available === false ? 'N/A' : gpu.fan_speed + '%'}</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-label">GPU 频率</span>
@@ -638,7 +638,12 @@ class GPUMonitorApp {
         if (allProcesses.length === 0) {
             tbody.innerHTML = '';
             noProcesses.style.display = 'block';
-            noProcesses.textContent = '当前 GPU 没有运行中的进程';
+            noProcesses.innerHTML = `
+                <div>当前 GPU 没有运行中的进程</div>
+                <div style="margin-top: 10px; font-size: 0.85rem; color: #a0a0a0;">
+                    注意：在 Windows 上，完整的进程内存信息可能需要管理员权限
+                </div>
+            `;
             return;
         }
 
@@ -648,17 +653,34 @@ class GPUMonitorApp {
 
         let html = '';
         allProcesses.forEach(proc => {
+            const hasMemInfo = proc.used_memory > 0;
+            const hasPermission = proc.has_permission !== false;
+            
+            let displayMemory = hasMemInfo ? proc.used_memory_mb.toFixed(1) + ' MB' : 'N/A';
+            let displayPercent = hasMemInfo ? proc.memoryPercent.toFixed(2) + '%' : 'N/A';
+            
+            if (!hasPermission) {
+                displayMemory += ' ⚠️';
+                displayPercent += ' ⚠️';
+            }
+
             html += `
                 <tr>
                     <td class="process-pid">${proc.pid}</td>
                     <td class="process-name">${proc.process_name}</td>
-                    <td class="process-memory">${proc.used_memory_mb.toFixed(1)} MB</td>
+                    <td class="process-memory">${displayMemory}</td>
                     <td>
-                        <div class="progress-bar" style="margin-top: 25px;">
-                            <div class="progress-fill ${this.getLevel(proc.memoryPercent, 20, 50)}" 
-                                 style="width: ${Math.min(proc.memoryPercent, 100)}%"></div>
-                            <span class="progress-label">${proc.memoryPercent.toFixed(2)}%</span>
-                        </div>
+                        ${hasMemInfo ? `
+                            <div class="progress-bar" style="margin-top: 25px;">
+                                <div class="progress-fill ${this.getLevel(proc.memoryPercent, 20, 50)}" 
+                                     style="width: ${Math.min(proc.memoryPercent, 100)}%"></div>
+                                <span class="progress-label">${proc.memoryPercent.toFixed(2)}%</span>
+                            </div>
+                        ` : `
+                            <div style="color: #a0a0a0; font-size: 0.85rem; padding: 8px 0;">
+                                ${hasPermission ? '内存信息不可用' : '权限不足 ⚠️'}
+                            </div>
+                        `}
                     </td>
                 </tr>
             `;
