@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ app_name }} - v{{ version }}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>{{ app_name }} <span class="version">v{{ version }}</span></h1>
+            <div class="status-bar">
+                <span class="connection-status" id="connectionStatus">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">连接中...</span>
+                </span>
+                <span class="update-time" id="updateTime">--</span>
+            </div>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="gpus">GPU 监控</button>
+            <button class="tab-btn" data-tab="system">系统信息</button>
+            <button class="tab-btn" data-tab="processes">进程列表</button>
+        </nav>
+
+        <main class="main-content">
+            <section id="gpus-tab" class="tab-content active">
+                <div class="gpu-selector" id="gpuSelector">
+                </div>
+
+                <div class="gpu-cards" id="gpuCards">
+                </div>
+
+                <div class="charts-container" id="chartsContainer">
+                    <div class="chart-row">
+                        <div class="chart-card">
+                            <h3>温度</h3>
+                            <canvas id="tempChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>GPU 利用率</h3>
+                            <canvas id="utilChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-row">
+                        <div class="chart-card">
+                            <h3>显存使用率</h3>
+                            <canvas id="memChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>功耗</h3>
+                            <canvas id="powerChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-row">
+                        <div class="chart-card">
+                            <h3>风扇转速</h3>
+                            <canvas id="fanChart"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <h3>时钟频率</h3>
+                            <canvas id="clockChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="system-tab" class="tab-content">
+                <div class="system-grid">
+                    <div class="system-card">
+                        <h3>系统信息</h3>
+                        <div class="info-list" id="systemInfo">
+                        </div>
+                    </div>
+                    <div class="system-card">
+                        <h3>CPU 状态</h3>
+                        <div class="progress-bar" id="cpuProgress">
+                            <div class="progress-fill" style="width: 0%"></div>
+                            <span class="progress-label">0%</span>
+                        </div>
+                        <div class="info-list" id="cpuInfo">
+                        </div>
+                    </div>
+                    <div class="system-card">
+                        <h3>内存状态</h3>
+                        <div class="progress-bar" id="memProgress">
+                            <div class="progress-fill" style="width: 0%"></div>
+                            <span class="progress-label">0%</span>
+                        </div>
+                        <div class="info-list" id="memInfo">
+                        </div>
+                    </div>
+                    <div class="system-card">
+                        <h3>交换分区</h3>
+                        <div class="progress-bar" id="swapProgress">
+                            <div class="progress-fill" style="width: 0%"></div>
+                            <span class="progress-label">0%</span>
+                        </div>
+                        <div class="info-list" id="swapInfo">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-title">磁盘使用</div>
+                <div class="disk-list" id="diskList">
+                </div>
+
+                <div class="section-title">网络接口</div>
+                <div class="network-list" id="networkList">
+                </div>
+            </section>
+
+            <section id="processes-tab" class="tab-content">
+                <div class="gpu-selector" id="processGpuSelector">
+                </div>
+                <div class="process-table-container">
+                    <table class="process-table">
+                        <thead>
+                            <tr>
+                                <th>PID</th>
+                                <th>进程名</th>
+                                <th>显存占用</th>
+                                <th>占比</th>
+                            </tr>
+                        </thead>
+                        <tbody id="processTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="no-processes" id="noProcesses" style="display: none;">
+                    当前 GPU 没有运行中的进程
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
